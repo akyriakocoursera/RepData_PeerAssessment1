@@ -1,14 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 echo = TRUE 
 library(ggplot2)
 
@@ -17,54 +13,84 @@ activity <- read.csv("activity.csv", colClasses = c("integer", "Date", "numeric"
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 complete_cases <- activity[complete.cases(activity),]
 cc_sum <-aggregate(steps~date, data=complete_cases, FUN="sum")
 
 bplot <- ggplot(cc_sum, aes(date, steps))
 bplot + geom_bar(stat="identity") + labs(title = "Total number of steps per day", x = "Date", y = "Steps (Total)")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 steps_mean <- mean(cc_sum$steps)
 steps_median <- median(cc_sum$steps)
 ```
 
 Mean total number of steps taken per day:
 
-```{r}
+
+```r
 mean(cc_sum$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 Median total number of steps taken per day:
 
-```{r}
+
+```r
 median(cc_sum$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
-```{r}
+
+```r
 steps_average <- aggregate(complete_cases$steps, list(interval = complete_cases$interval), FUN="mean")
 tsplot <- ggplot(steps_average, aes(interval, steps_average$x))
 tsplot + geom_line() + labs(title = "Time series plot of average steps over 5mins Inteval", x = "Interval (5min)", y = "Steps (Average)")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
 Interval contaiing the max steps :
 
-```{r}
+
+```r
 steps_average[steps_average$x == max(steps_average$x), ]
+```
+
+```
+##     interval        x
+## 104      835 206.1698
 ```
 
 ## Imputing missing values
 
 Total number of missing values : 
 
-```{r}
+
+```r
 sum(is.na(activity)) 
+```
+
+```
+## [1] 2304
 ```
 
 We are going to fill the missing values in the dataset with the mean value for that day :
 
-```{r}
+
+```r
 filled_cases <- activity
 steps_average_per_day <- aggregate(steps~date, data=complete_cases, FUN="mean")
 
@@ -87,26 +113,38 @@ cc_sum2 <-aggregate(steps~date, data=filled_cases, FUN="sum")
 
 bplot2 <- ggplot(filled_cases, aes(date, steps))
 bplot2 + geom_bar(stat="identity") + labs(title = "Total number of steps per day - Missing data were filled with day average", x = "Date", y = "Steps (Total)")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
 
 Mean total number of steps taken per day:
 
-```{r}
+
+```r
 mean(cc_sum2$steps)
+```
+
+```
+## [1] 9354.23
 ```
 
 Median total number of steps taken per day:
 
-```{r}
+
+```r
 median(cc_sum2$steps)
+```
+
+```
+## [1] 10395
 ```
 
 Mean and median values significantly differ.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 filled_cases$isweekday <- factor(weekdays(filled_cases$date))
 levels(filled_cases$isweekday) <- list(weekday = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"), weekend = c("Saturday", "Sunday"))
 
@@ -117,3 +155,5 @@ names(steps_average2)[2] <- "isweekday"
 tsplot2 <- ggplot(filled_cases, aes(interval , steps))
 tsplot2 + geom_line() + facet_grid(isweekday ~ .) + labs(x = "Interval", y = "Number of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
